@@ -4,15 +4,15 @@
 #include <TF1.h>
 #include <TFile.h>
 
-class SpaceCharge
+class SpaceChargeSBND
 {
 
  public:
 
-    SpaceCharge(std::string filename,
+    SpaceChargeSBND(std::string filename,
                 const int initialSpatialPolN[3], const int intermediateSpatialPolN[3], const int initialEFieldPolN[3], const int intermediateEFieldPolN[3],
-                const std::string eName);
-    ~SpaceCharge();
+                const double drift);
+    ~SpaceChargeSBND();
 
     bool Configure(std::string filename);
     std::vector<double> GetPosOffsets(double xVal, double yVal, double zVal) const;
@@ -21,7 +21,7 @@ class SpaceCharge
  protected:
     int initialSpatialFitPolN[3], intermediateSpatialFitPolN[3];
     int initialEFieldFitPolN[3], intermediateEFieldFitPolN[3];
-    std::string ExperimentName;//MicroBooNE, ProtoDUNE, SBND
+    double DriftField; // 500 V/cm, 273 V/cm
 
     std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
     double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;
@@ -55,4 +55,4 @@ class SpaceCharge
     TGraph *gEFieldGraphZ[99][99];
     TF1 *intermediateEFieldFitFunctionZ[99];
     TF1 *initialEFieldFitFunctionZ;
-}; // class SpaceCharge
+}; // class SpaceChargeSBND

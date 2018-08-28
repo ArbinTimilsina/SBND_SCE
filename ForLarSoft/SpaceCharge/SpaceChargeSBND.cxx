@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////
-// SpaceCharge.C                                                            //
+// SpaceChargeSBND.cxx                                                            //
 // Brief implementation of class for storing/accessing space charge distortions  //
 ////////////////////////////////////////////////////////////////////////////////////
 
@@ -12,12 +12,12 @@
 #include <TFile.h>
 #include <TCanvas.h>
 
-#include "SpaceCharge.h"
+#include "SpaceChargeSBND.h"
 
-SpaceCharge::SpaceCharge(std::string filename,
+SpaceChargeSBND::SpaceChargeSBND(std::string filename,
                          const int initialSpatialPolN[3], const int intermediateSpatialPolN[3], const int initialEFieldPolN[3], const int intermediateEFieldPolN[3],
-                         const std::string eName)
-    : ExperimentName(eName)
+                         const double drift)
+    : DriftField(drift)
 {
     for(int i = 0; i < 3; i++)
         {
@@ -30,17 +30,12 @@ SpaceCharge::SpaceCharge(std::string filename,
     Configure(filename);
 }
 
-SpaceCharge::~SpaceCharge()
+SpaceChargeSBND::~SpaceChargeSBND()
 {
 }
 
-bool SpaceCharge::Configure(std::string filename)
+bool SpaceChargeSBND::Configure(std::string filename)
 {
-    if(ExperimentName != "MicroBooNE" && ExperimentName != "ProtoDUNE")
-        {
-            std::cout << "Experiment " << ExperimentName << " not found! Exiting!" << std::endl;
-            exit(1);
-        }
 
     TFile inputfile(filename.c_str(), "READ");
 
@@ -115,7 +110,7 @@ bool SpaceCharge::Configure(std::string filename)
 
 // Primary working method of service that provides position offsets to be
 // used in ionization electron drift
-std::vector<double> SpaceCharge::GetPosOffsets(double xVal, double yVal, double zVal) const
+std::vector<double> SpaceChargeSBND::GetPosOffsets(double xVal, double yVal, double zVal) const
 {
     std::vector<double> thePosOffsets;
 
@@ -128,11 +123,17 @@ std::vector<double> SpaceCharge::GetPosOffsets(double xVal, double yVal, double 
             thePosOffsets = GetPosOffsetsParametric(xVal, yVal, zVal);
         }
 
+    // GetPosOffsetsParametric returns m
+    // The PosOffsets are returned as cm
+    thePosOffsets.at(0) = 100.0 * thePosOffsets.at(0);
+    thePosOffsets.at(1) = 100.0 * thePosOffsets.at(1);
+    thePosOffsets.at(2) = 100.0 * thePosOffsets.at(2);
+
     return thePosOffsets;
 }
 
 // Provides position offsets using a parametric representation
-std::vector<double> SpaceCharge::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> SpaceChargeSBND::GetPosOffsetsParametric(double xVal, double yVal, double zVal) const
 {
     std::vector<double> thePosOffsetsParametric;
 
@@ -149,7 +150,7 @@ std::vector<double> SpaceCharge::GetPosOffsetsParametric(double xVal, double yVa
 
 
 // Provides one position offset using a parametric representation, for a given axis
-double SpaceCharge::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double SpaceChargeSBND::GetOnePosOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
 {
     double parA[99][99];
     double parB[99];
@@ -217,7 +218,7 @@ double SpaceCharge::GetOnePosOffsetParametric(double xValNew, double yValNew, do
                     parB[i] = intermediateSpatialFitFunctionX[i]->Eval(aValNew);
                 }
             initialSpatialFitFunctionX->SetParameters(parB);
-            offsetValNew = 100.0 * initialSpatialFitFunctionX->Eval(bValNew);
+            offsetValNew = initialSpatialFitFunctionX->Eval(bValNew);
         }
     else if(axis == "Y")
         {
@@ -226,7 +227,7 @@ double SpaceCharge::GetOnePosOffsetParametric(double xValNew, double yValNew, do
                     parB[i] = intermediateSpatialFitFunctionY[i]->Eval(aValNew);
                 }
             initialSpatialFitFunctionY->SetParameters(parB);
-            offsetValNew = 100.0 * initialSpatialFitFunctionY->Eval(bValNew);
+            offsetValNew = initialSpatialFitFunctionY->Eval(bValNew);
         }
     else if(axis == "Z")
         {
@@ -235,7 +236,7 @@ double SpaceCharge::GetOnePosOffsetParametric(double xValNew, double yValNew, do
                     parB[i] = intermediateSpatialFitFunctionZ[i]->Eval(aValNew);
                 }
             initialSpatialFitFunctionZ->SetParameters(parB);
-            offsetValNew = 100.0 * initialSpatialFitFunctionZ->Eval(bValNew);
+            offsetValNew = initialSpatialFitFunctionZ->Eval(bValNew);
         }
 
     return offsetValNew;
@@ -243,7 +244,7 @@ double SpaceCharge::GetOnePosOffsetParametric(double xValNew, double yValNew, do
 
 // Primary working method of service that provides E field offsets to be
 // used in charge/light yield calculation (e.g.)
-std::vector<double> SpaceCharge::GetEfieldOffsets(double xVal, double yVal, double zVal) const
+std::vector<double> SpaceChargeSBND::GetEfieldOffsets(double xVal, double yVal, double zVal) const
 {
     std::vector<double> theEfieldOffsets;
 
@@ -256,15 +257,17 @@ std::vector<double> SpaceCharge::GetEfieldOffsets(double xVal, double yVal, doub
             theEfieldOffsets = GetEfieldOffsetsParametric(xVal, yVal, zVal);
         }
 
-    //theEfieldOffsets.at(0) = -1.0 * theEfieldOffsets.at(0);
-    //theEfieldOffsets.at(1) = -1.0 * theEfieldOffsets.at(1);
-    //theEfieldOffsets.at(2) = -1.0 * theEfieldOffsets.at(2);
+    // GetOneEfieldOffsetParametric returns V/m
+    // The E-field offsets are returned as -dEx/|E_nominal|, -dEy/|E_nominal|, and -dEz/|E_nominal| where |E_nominal| is DriftField
+    theEfieldOffsets.at(0) = -1.0 * theEfieldOffsets.at(0) / (100.0 * DriftField);
+    theEfieldOffsets.at(1) = -1.0 * theEfieldOffsets.at(1) / (100.0 * DriftField);
+    theEfieldOffsets.at(2) = -1.0 * theEfieldOffsets.at(2) / (100.0 * DriftField);
 
     return theEfieldOffsets;
 }
 
 // Provides E field offsets using a parametric representation
-std::vector<double> SpaceCharge::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
+std::vector<double> SpaceChargeSBND::GetEfieldOffsetsParametric(double xVal, double yVal, double zVal) const
 {
     std::vector<double> theEfieldOffsetsParametric;
 
@@ -280,7 +283,7 @@ std::vector<double> SpaceCharge::GetEfieldOffsetsParametric(double xVal, double 
 }
 
 // Provides one E field offset using a parametric representation, for a given axis
-double SpaceCharge::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
+double SpaceChargeSBND::GetOneEfieldOffsetParametric(double xValNew, double yValNew, double zValNew, std::string axis) const
 {
     double parA[99][99];
     double parB[99];
@@ -373,74 +376,48 @@ double SpaceCharge::GetOneEfieldOffsetParametric(double xValNew, double yValNew,
     return offsetValNew;
 }
 
-// Transform X to SCE X coordinate
-double SpaceCharge::TransformX(double xVal) const
+// Transform LarSoft-X (cm) to SCE-X (m) coordinate
+// [-196.5, 196.5] to [0, 2.0]
+double SpaceChargeSBND::TransformX(double xVal) const
 {
-    double xValNew = 0.0;
+    xVal = xVal / 100.0;
 
-    if(ExperimentName == "MicroBooNE")
-        {
-            xValNew = 2.50 - (2.50 / 2.56) * (xVal / 100.0);
-            xValNew -= 1.25;
-        }
-    else if(ExperimentName == "ProtoDUNE")
-        {
-            xValNew = (fabs(xVal) / 100.0);
-            xValNew -= 1.8;
-        }
+    // We use the same map twice
+    // Map [0, 196.5] to [0, 2.0] first; 0 is cathod
+    double xValNew = (2.0 / 1.965) * fabs(xVal);
+
+    // Now map [-196.5, 196.5] to [0, 2.0]
+    xValNew -= 1.965;
 
     return xValNew;
 }
 
-// Transform Y to SCE Y coordinate
-double SpaceCharge::TransformY(double yVal) const
+// Transform LarSoft-Y (cm) to SCE-Y (m) coordinate
+// [-200.0, 200.0] to [0, 4.0]
+double SpaceChargeSBND::TransformY(double yVal) const
 {
-    double yValNew = 0.0;
-    if(ExperimentName == "MicroBooNE")
-        {
-            yValNew = (2.50 / 2.33) * ((yVal / 100.0) + 1.165);
-            yValNew -= 1.25;
-        }
-    else if(ExperimentName == "ProtoDUNE")
-        {
-            yValNew = (6.00 / 6.08) * ((yVal + 0.2) / 100.0);
-            yValNew -= 3.0;
-        }
-    return yValNew;
+    yVal = yVal / 100.0;
+
+    return (yVal + 2.0);
 }
 
-// Transform Z to SCE Z coordinate
-double SpaceCharge::TransformZ(double zVal) const
+// Transform LarSoft-Z (cm) to SCE-Z (m) coordinate
+// [0, 500.0] to [0, 5.0]
+double SpaceChargeSBND::TransformZ(double zVal) const
 {
-    double zValNew = 0.0;
-    if(ExperimentName == "MicroBooNE")
-        {
-            zValNew = (10.0 / 10.37) * (zVal / 100.0);
-        }
-    else if(ExperimentName == "ProtoDUNE")
-        {
-            zValNew = (7.20 / 6.97) * ((zVal + 0.8) / 100.0);
-        }
-    return zValNew;
+    return zVal / 100.0;
 }
 
-// Check to see if point is inside boundaries of map (allow to go slightly out of range)
-bool SpaceCharge::IsInsideBoundaries(double xVal, double yVal, double zVal) const
+// Check to see if point is inside boundaries of map
+// x = [-196.5, 196.5], y = [-200, 200], and z = [0, 500]  is the active volume boundary
+// Allow to go slightly out of range; by 5 cm
+bool SpaceChargeSBND::IsInsideBoundaries(double xVal, double yVal, double zVal) const
 {
     bool isInside = true;
-    if(ExperimentName == "MicroBooNE")
+
+    if((xVal < -201.5) || (xVal > 201.5) || (yVal < -205.0) || (yVal > 205.0) || (zVal < -5.0) || (zVal > 505.0))
         {
-            if((xVal < 0.0) || (xVal > 260.0) || (yVal < -120.0) || (yVal > 120.0) || (zVal < 0.0) || (zVal > 1050.0))
-                {
-                    isInside = false;
-                }
-        }
-    else if(ExperimentName == "ProtoDUNE")
-        {
-            if((xVal < -360.0) || (xVal > 360.0) || (yVal < -5.0) || (yVal > 615.0) || (zVal < -5.0) || (zVal > 705.0))
-                {
-                    isInside = false;
-                }
+            isInside = false;
         }
 
     return isInside;

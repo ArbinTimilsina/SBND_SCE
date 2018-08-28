@@ -9,7 +9,7 @@
 #include <TSystem.h>
 #include <TTree.h>
 
-#include "../../SourceCode/MapSCE.h"
+#include "../../MakeMapSource/MapSCE.h"
 
 using namespace std;
 
@@ -81,13 +81,10 @@ int main()
 {
     cout << endl;
 
-    TString inputFile = "../../InputFiles/dispOutput_protoDUNE_E500.root";
-    string experimentName = "ProtoDUNE";
-    double binningFactor = 5.0;
+    TString inputFile = "../../InputFiles/dispOutput_SBND_E500.root";
+    string experimentName = "SBND";
+    double binningFactor = 10.0;
 
-    //TString inputFile = "../../InputFiles/dispOutput_MicroBooNE_E500.root";
-    //string experimentName = "MicroBooNE";
-    //double binningFactor = 10.0;
 
     // These directories must exist for it to work
     TString outputFile = "../../OutputFiles";
