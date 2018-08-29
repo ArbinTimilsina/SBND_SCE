@@ -61,6 +61,7 @@ void CopyDir(TDirectory *source, char* dirName)
     adir->SaveSelf(kTRUE);
     savdir->cd();
 }
+
 void CopyFile(const char *fname, char* dirName)
 {
     TDirectory *target = gDirectory;
@@ -83,15 +84,14 @@ int main()
 
     TString inputFile = "../../InputFiles/dispOutput_SBND_E500.root";
     string experimentName = "SBND";
-    double binningFactor = 10.0;
-
+    double binningFactor = 12.0;
 
     // These directories must exist for it to work
     TString outputFile = "../../OutputFiles";
     string histoDir = "../../HistoDirectory";
     double driftField = 500.0;
 
-    cout << "Doing calculations for " << experimentName << " with drift field of " << driftField << "V/cm" << endl;
+    cout << "Doing calculations for " << experimentName << " with drift field of " << driftField << "V/cm." << endl;
     /////////////////////////////////////////////////////////////////////
     // Set location of directories
     /////////////////////////////////////////////////////////////////////
@@ -113,20 +113,20 @@ int main()
 
     // X dimension
     dimension = "X";
-    initialPolN = 4;
-    intermediatePolN = 6;
+    initialPolN = 5;
+    intermediatePolN = 9;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
 
     // Y dimension
     dimension = "Y";
     initialPolN = 5;
-    intermediatePolN = 5;
+    intermediatePolN = 9;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
 
     // Z dimension
     dimension = "Z";
-    initialPolN = 3;
-    intermediatePolN = 4;
+    initialPolN = 5;
+    intermediatePolN = 9;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
 
     /////////////////////////////////////////////////////////////////////
@@ -161,9 +161,9 @@ int main()
     CopyFile(outputFile + "/Result_Spatial_Y.root", (char*)"deltaY");
     CopyFile(outputFile + "/Result_Spatial_Z.root", (char*)"deltaZ");
 
-    CopyFile(outputFile + "/Result_EField_X.root", (char*)"deltaExOverE");
-    CopyFile(outputFile + "/Result_EField_Y.root", (char*)"deltaEyOverE");
-    CopyFile(outputFile + "/Result_EField_Z.root", (char*)"deltaEzOverE");
+    CopyFile(outputFile + "/Result_EField_X.root", (char*)"deltaEx");
+    CopyFile(outputFile + "/Result_EField_Y.root", (char*)"deltaEy");
+    CopyFile(outputFile + "/Result_EField_Z.root", (char*)"deltaEz");
 
     delete finalOutputFile;
 

@@ -171,7 +171,7 @@ void MapSCE::PerformTransformation(string FieldToTransform, string DimensionToTr
         }
     else if(DimensionToTransform == "Y")
         {
-            iBins = xBins - 1;
+            iBins = xBins;// - 1;
             jBins = zBins;
 
             xAxisInitialMin = -yLimit;

@@ -15,8 +15,8 @@
 #include "SpaceChargeSBND.h"
 
 SpaceChargeSBND::SpaceChargeSBND(std::string filename,
-                         const int initialSpatialPolN[3], const int intermediateSpatialPolN[3], const int initialEFieldPolN[3], const int intermediateEFieldPolN[3],
-                         const double drift)
+                                 const int initialSpatialPolN[3], const int intermediateSpatialPolN[3], const int initialEFieldPolN[3], const int intermediateEFieldPolN[3],
+                                 const double drift)
     : DriftField(drift)
 {
     for(int i = 0; i < 3; i++)
@@ -75,7 +75,7 @@ bool SpaceChargeSBND::Configure(std::string filename)
         {
             for(int j = 0; j < intermediateEFieldFitPolN[0] + 1; j++)
                 {
-                    gEFieldGraphX[i][j] = (TGraph*)inputfile.Get(Form("deltaExOverE/g%i_%i", i, j));
+                    gEFieldGraphX[i][j] = (TGraph*)inputfile.Get(Form("deltaEx/g%i_%i", i, j));
 
                 }
             intermediateEFieldFitFunctionX[i] = new TF1(Form("intermediateEFieldFitFunctionX_%i", i), Form("pol%i", intermediateEFieldFitPolN[0]));
@@ -84,7 +84,7 @@ bool SpaceChargeSBND::Configure(std::string filename)
         {
             for(int j = 0; j < intermediateEFieldFitPolN[1] + 1; j++)
                 {
-                    gEFieldGraphY[i][j] = (TGraph*)inputfile.Get(Form("deltaEyOverE/g%i_%i", i, j));
+                    gEFieldGraphY[i][j] = (TGraph*)inputfile.Get(Form("deltaEy/g%i_%i", i, j));
 
                 }
             intermediateEFieldFitFunctionY[i] = new TF1(Form("intermediateEFieldFitFunctionY_%i", i), Form("pol%i", intermediateEFieldFitPolN[1]));
@@ -93,7 +93,7 @@ bool SpaceChargeSBND::Configure(std::string filename)
         {
             for(int j = 0; j < intermediateEFieldFitPolN[2] + 1; j++)
                 {
-                    gEFieldGraphZ[i][j] = (TGraph*)inputfile.Get(Form("deltaEzOverE/g%i_%i", i, j));
+                    gEFieldGraphZ[i][j] = (TGraph*)inputfile.Get(Form("deltaEz/g%i_%i", i, j));
 
                 }
             intermediateEFieldFitFunctionZ[i] = new TF1(Form("intermediateEFieldFitFunctionZ_%i", i), Form("pol%i", intermediateEFieldFitPolN[2]));
@@ -382,12 +382,9 @@ double SpaceChargeSBND::TransformX(double xVal) const
 {
     xVal = xVal / 100.0;
 
-    // We use the same map twice
-    // Map [0, 196.5] to [0, 2.0] first; 0 is cathod
+    // We use the same map twice; 0 is cathod
+    // Map [0, 196.5] to [0, 2.0]
     double xValNew = (2.0 / 1.965) * fabs(xVal);
-
-    // Now map [-196.5, 196.5] to [0, 2.0]
-    xValNew -= 1.965;
 
     return xValNew;
 }
@@ -405,7 +402,7 @@ double SpaceChargeSBND::TransformY(double yVal) const
 // [0, 500.0] to [0, 5.0]
 double SpaceChargeSBND::TransformZ(double zVal) const
 {
-    return zVal / 100.0;
+    return (zVal / 100.0);
 }
 
 // Check to see if point is inside boundaries of map

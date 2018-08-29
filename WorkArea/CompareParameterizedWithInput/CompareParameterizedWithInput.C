@@ -47,8 +47,8 @@ int main()
 {
     TFile *fileInput = new TFile("../../InputFiles/dispOutput_SBND_E500.root");
 
-    int initialSpatialN[3] = {4, 5, 3};
-    int intermediateSpatialN[3] = {6, 5, 4};
+    int initialSpatialN[3] = {5, 5, 5};
+    int intermediateSpatialN[3] = {9, 9, 9};
     int initialEFieldN[3] = {4, 5, 3};
     int intermediateEFieldN[3] = {6, 5, 4};
 
@@ -63,14 +63,14 @@ int main()
     int zMin = -5;
     int zMax = 500;
 
-    const int dBins = 180;
-    const double minD = -1000.0;
-    const double maxD = 1000.0;
+    const int dBins = 120;
+    const double minD = -6.0;
+    const double maxD = 6.0;
     const int eBins = 180;
     const double minE = -5.0;
     const double maxE = 5.0;
 
-    TH1D *iDx = new TH1D("iDx", "", dBins, -0.015, 0.015);
+    TH1D *iDx = new TH1D("iDx", "", dBins, -0.009, 0.003);
     TH1D *iDy = new TH1D("iDy", "", dBins, -0.06, 0.06);
     TH1D *iDz = new TH1D("iDz", "", dBins, -0.06, 0.06);
     TH1D *iEx = new TH1D("iEx", "", eBins, -3000.0, 1500.0);
@@ -193,5 +193,5 @@ int main()
     mEz->Draw();
 
     cComparisionD->SaveAs("SBND_Spatial.pdf");
-    cComparisionE->SaveAs("SBND_EField.pdf");
+    //cComparisionE->SaveAs("SBND_EField.pdf");
 }
