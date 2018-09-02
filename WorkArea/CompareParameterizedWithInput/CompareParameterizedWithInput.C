@@ -47,40 +47,39 @@ int main()
 {
     TFile *fileInput = new TFile("../../InputFiles/dispOutput_SBND_E500.root");
 
-    int initialSpatialN[3] = {5, 5, 5};
-    int intermediateSpatialN[3] = {9, 9, 9};
+    int initialSpatialN[3] = {4, 5, 3};
+    int intermediateSpatialN[3] = {6, 5, 4};
     int initialEFieldN[3] = {4, 5, 3};
     int intermediateEFieldN[3] = {6, 5, 4};
-
 
     SpaceChargeSBND *mapSBND = new SpaceChargeSBND("../../OutputFiles/SCEoffsets_SBND_E500.root",
 						   initialSpatialN, intermediateSpatialN, initialEFieldN, intermediateEFieldN,
 						   500.0);
-    int xMin = -202;
-    int xMax = 202;
-    int yMin = -205;
-    int yMax = 205;
-    int zMin = -5;
-    int zMax = 500;
+    int xMin = -210;
+    int xMax = 210;
+    int yMin = -210;
+    int yMax = 210;
+    int zMin = -10;
+    int zMax = 510;
 
-    const int dBins = 120;
+    const int dBins = 240;
     const double minD = -6.0;
     const double maxD = 6.0;
-    const int eBins = 180;
-    const double minE = -5.0;
-    const double maxE = 5.0;
+    const int eBins = 160;
+    const double minE = -0.04;
+    const double maxE = 0.04;
 
     TH1D *iDx = new TH1D("iDx", "", dBins, -0.009, 0.003);
-    TH1D *iDy = new TH1D("iDy", "", dBins, -0.06, 0.06);
-    TH1D *iDz = new TH1D("iDz", "", dBins, -0.06, 0.06);
-    TH1D *iEx = new TH1D("iEx", "", eBins, -3000.0, 1500.0);
-    TH1D *iEy = new TH1D("iEy", "", eBins, -2000.0, 2000.0);
-    TH1D *iEz = new TH1D("iEz", "", eBins, -2000.0, 2000.0);
+    TH1D *iDy = new TH1D("iDy", "", dBins, minD / 100.0, maxD / 100.0);
+    TH1D *iDz = new TH1D("iDz", "", dBins, minD / 100.0, maxD / 100.0);
+    TH1D *iEx = new TH1D("iEx", "", eBins, -3000.0, 3000.0);
+    TH1D *iEy = new TH1D("iEy", "", eBins, minE * 100 * 500, maxE * 100 * 500);
+    TH1D *iEz = new TH1D("iEz", "", eBins, minE * 100 * 500, maxE * 100 * 500);
 
-    TH1D *mDx = new TH1D("mDx", "", dBins, minD, maxD);
+    TH1D *mDx = new TH1D("mDx", "", dBins, -0.9, 0.3);
     TH1D *mDy = new TH1D("mDy", "", dBins, minD, maxD);
     TH1D *mDz = new TH1D("mDz", "", dBins, minD, maxD);
-    TH1D *mEx = new TH1D("mEx", "", eBins, minE, maxE);
+    TH1D *mEx = new TH1D("mEx", "", eBins, -0.06, 0.06);
     TH1D *mEy = new TH1D("mEy", "", eBins, minE, maxE);
     TH1D *mEz = new TH1D("mEz", "", eBins, minE, maxE);
 
@@ -127,6 +126,7 @@ int main()
                         }
                 }
         }
+
 
     TCanvas *cComparisionD = new TCanvas("cComparision", "", 1500, 1800);
     cComparisionD->Divide(2, 3);
@@ -193,5 +193,5 @@ int main()
     mEz->Draw();
 
     cComparisionD->SaveAs("SBND_Spatial.pdf");
-    //cComparisionE->SaveAs("SBND_EField.pdf");
+    cComparisionE->SaveAs("SBND_EField.pdf");
 }

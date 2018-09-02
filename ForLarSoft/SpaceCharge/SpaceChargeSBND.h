@@ -10,8 +10,8 @@ class SpaceChargeSBND
  public:
 
     SpaceChargeSBND(std::string filename,
-                const int initialSpatialPolN[3], const int intermediateSpatialPolN[3], const int initialEFieldPolN[3], const int intermediateEFieldPolN[3],
-                const double drift);
+                    const int initialSpatialPolN[3], const int intermediateSpatialPolN[3], const int initialEFieldPolN[3], const int intermediateEFieldPolN[3],
+                    const double drift);
     ~SpaceChargeSBND();
 
     bool Configure(std::string filename);
@@ -21,7 +21,7 @@ class SpaceChargeSBND
  protected:
     int initialSpatialFitPolN[3], intermediateSpatialFitPolN[3];
     int initialEFieldFitPolN[3], intermediateEFieldFitPolN[3];
-    double DriftField; // 500 V/cm, 273 V/cm
+    double DriftField; // 500 V/cm
 
     std::vector<double> GetPosOffsetsParametric(double xVal, double yVal, double zVal) const;
     double GetOnePosOffsetParametric(double xVal, double yVal, double zVal, std::string axis) const;

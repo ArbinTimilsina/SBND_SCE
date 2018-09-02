@@ -110,83 +110,52 @@ void MapSCE::PerformTransformation(string FieldToTransform, string DimensionToTr
     ///////////////////////////////////////////////////////////////////////////////////////////
     cout << "Total Entries in the Tree is: " << TreeInput->GetEntries() << endl;
 
-    double xTrueMax = -9999.99, yTrueMax = -9999.99, zTrueMax = -9999.99;
-    for (int i = 0; i < TreeInput->GetEntries(); i++)
-        {
-            TreeInput->GetEntry(i);
-
-            if(xTrue > xTrueMax)
-                {
-                    xTrueMax = xTrue;
-                }
-            if(yTrue > yTrueMax)
-                {
-                    yTrueMax = yTrue;
-                }
-            if(zTrue > zTrueMax)
-                {
-                    zTrueMax = zTrue;
-                }
-        }
+    double xTrueMax = 2.0;
+    double yTrueMax = 4.0;
+    double zTrueMax = 5.0;
 
     cout << endl;
     cout << "xTrueMax = " << xTrueMax << ", yTrueMax = " << yTrueMax << ", zTrueMax = " << zTrueMax << endl;
 
-    int xBins = xTrueMax * BinningFactor, yBins = yTrueMax * BinningFactor, zBins = zTrueMax * BinningFactor;
+    int xBins = int(xTrueMax * BinningFactor), yBins = int(yTrueMax * BinningFactor), zBins = int(zTrueMax * BinningFactor);
     cout << "xBins = " << xBins << ", yBins = " << yBins << ", zBins = " << zBins << endl;
 
-    double xLimit = xTrueMax / 2.0, yLimit = yTrueMax / 2.0, zLimit = zTrueMax / 2.0;
-    cout << "xLimt = " << xLimit << ", yLimt = " << yLimit << ", zLimt = " << zLimit << endl;
-
-    double nLimit = 0.005*BinningFactor;
-    cout << "nLimt = " << nLimit <<endl;
+    double nLimit = 0.005 * BinningFactor;
+    cout << "nLimt = " << nLimit << endl;
 
     cout << endl << endl;
 
     int iBins = 0, jBins = 0;
-    double xAxisInitialMin = 0.0, xAxisInitialMax = 0;
     TString initialWhatToDraw = "", initialConditionToDraw = "";
-
-    double xAxisIntermediateMin = 0.0, xAxisIntermediateMax = 0;
     if(DimensionToTransform == "X")
         {
             iBins = yBins;
             jBins = zBins;
 
-            xAxisInitialMin = -xLimit;
-            xAxisInitialMax = xLimit;
-            xAxisIntermediateMin = -yLimit;
-            xAxisIntermediateMax = yLimit;
-
             if(FieldToTransform == "Spatial")
                 {
-                    initialWhatToDraw =  Form("Dx:x_true-%f", xAxisInitialMax - 0.0001);
+                    initialWhatToDraw =  "Dx:x_true";
                     initialConditionToDraw = "fabs(y_true-%f)<%f && fabs(z_true-%f)<%f";
                 }
             else
                 {
-                    initialWhatToDraw =  Form("Ex:xpoint-%f", xAxisInitialMax);
+                    initialWhatToDraw =  "Ex:xpoint";
                     initialConditionToDraw = "fabs(ypoint-%f)<%f && fabs(zpoint-%f)<%f";
                 }
         }
     else if(DimensionToTransform == "Y")
         {
-            iBins = xBins;// - 1;
+            iBins = xBins;
             jBins = zBins;
-
-            xAxisInitialMin = -yLimit;
-            xAxisInitialMax = yLimit;
-            xAxisIntermediateMin = -xLimit;
-            xAxisIntermediateMax = xLimit;
 
             if(FieldToTransform == "Spatial")
                 {
-                    initialWhatToDraw =  Form("Dy:y_true-%f", xAxisInitialMax);
+                    initialWhatToDraw =  "Dy:y_true";
                     initialConditionToDraw = "fabs(x_true-%f)<%f && fabs(z_true-%f)<%f";
                 }
             else
                 {
-                    initialWhatToDraw =  Form("Ey:ypoint-%f", xAxisInitialMax);
+                    initialWhatToDraw =  "Ey:ypoint";
                     initialConditionToDraw = "fabs(xpoint-%f)<%f && fabs(zpoint-%f)<%f";
                 }
         }
@@ -195,19 +164,14 @@ void MapSCE::PerformTransformation(string FieldToTransform, string DimensionToTr
             iBins = yBins;
             jBins = zBins;
 
-            xAxisInitialMin = -xLimit;
-            xAxisInitialMax = xLimit;
-            xAxisIntermediateMin = -yLimit;
-            xAxisIntermediateMax = yLimit;
-
             if(FieldToTransform == "Spatial")
                 {
-                    initialWhatToDraw =  Form("Dz:x_true-%f", xAxisInitialMax);
+                    initialWhatToDraw =  "Dz:x_true";
                     initialConditionToDraw = "fabs(y_true-%f)<%f && fabs(z_true-%f)<%f";
                 }
             else
                 {
-                    initialWhatToDraw =  Form("Ez:xpoint-%f", xAxisInitialMax);
+                    initialWhatToDraw =  "Ez:xpoint";
                     initialConditionToDraw = "fabs(ypoint-%f)<%f && fabs(zpoint-%f)<%f";
                 }
         }
@@ -223,8 +187,6 @@ void MapSCE::PerformTransformation(string FieldToTransform, string DimensionToTr
     cout << "Initial what to draw: " << initialWhatToDraw << endl;
     cout << "Initial condition to draw: " << initialConditionToDraw << endl;
     cout << "iBins, jBins: " << iBins << ", " << jBins << endl;
-    cout << "xAxisInitialMin, xAxisInitialMax: " << xAxisInitialMin << ", " << xAxisInitialMax << endl;
-    cout << "xAxisIntermediateMin, xAxisIntermediateMax: " << xAxisIntermediateMin << ", " << xAxisIntermediateMax << endl << endl;
 
     double iPosition = 0.0, jPosition = 0.0;
     double initialFitParameter[initialFitPolN + 1];
@@ -305,7 +267,7 @@ void MapSCE::PerformTransformation(string FieldToTransform, string DimensionToTr
                     cIntermediateHistos->cd();
 
                     TF1 *intermediateFitFunction =  new TF1("intermediateFitFunction", Form("pol%i", intermediateFitPolN));
-                    tIntermediateTree->Fit("intermediateFitFunction", Form("initialFitParameter_%i:iPosition-%f", r, xAxisIntermediateMax), Form("fabs(jPosition-%f)<%f", kPosition, nLimit), "Q");
+                    tIntermediateTree->Fit("intermediateFitFunction", Form("initialFitParameter_%i:iPosition", r), Form("fabs(jPosition-%f)<%f", kPosition, nLimit), "Q");
                     intermediateFitFunction->GetParameters(intermediateFitParameter[r]);
                     intermediateFitFunction->SetLineWidth(1);
 

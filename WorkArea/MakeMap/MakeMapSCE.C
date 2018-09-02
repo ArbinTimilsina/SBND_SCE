@@ -113,21 +113,23 @@ int main()
 
     // X dimension
     dimension = "X";
-    initialPolN = 5;
-    intermediatePolN = 9;
+    initialPolN = 4;
+    intermediatePolN = 6;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
 
     // Y dimension
     dimension = "Y";
     initialPolN = 5;
-    intermediatePolN = 9;
+    intermediatePolN = 5;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
+
 
     // Z dimension
     dimension = "Z";
-    initialPolN = 5;
-    intermediatePolN = 9;
+    initialPolN = 3;
+    intermediatePolN = 4;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
+
 
     /////////////////////////////////////////////////////////////////////
     // EField field
