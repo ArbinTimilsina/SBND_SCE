@@ -407,12 +407,12 @@ double SpaceChargeSBND::TransformZ(double zVal) const
 
 // Check to see if point is inside boundaries of map
 // x = [-196.5, 196.5], y = [-200, 200], and z = [0, 500]  is the active volume boundary
-// Allow to go slightly out of range; by 5 cm
+// For now, don't allow to go (slightly) out of range; will change if necessary
 bool SpaceChargeSBND::IsInsideBoundaries(double xVal, double yVal, double zVal) const
 {
     bool isInside = true;
 
-    if((xVal < -201.5) || (xVal > 201.5) || (yVal < -205.0) || (yVal > 205.0) || (zVal < -5.0) || (zVal > 505.0))
+    if((xVal < -196.5) || (xVal > 196.5) || (yVal < -200.0) || (yVal > 200.0) || (zVal < 0) || (zVal > 500.0))
         {
             isInside = false;
         }

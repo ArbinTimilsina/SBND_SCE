@@ -24,7 +24,7 @@ using namespace std;
 void setHisto(TH1 *histo, TString xAxis, TString yAxis)
 {
     histo->GetXaxis()->SetTitle(xAxis);
-    histo->GetXaxis()->SetTitleSize(0.065);
+    histo->GetXaxis()->SetTitleSize(0.05);
     histo->GetXaxis()->SetTitleOffset(0.75);
     histo->GetXaxis()->SetTitleFont(62);
     histo->GetXaxis()->SetTickLength(0.04);
@@ -45,38 +45,41 @@ void setHisto(TH1 *histo, TString xAxis, TString yAxis)
 
 int main()
 {
+    bool setLog = true;
+
     TFile *fileInput = new TFile("../../InputFiles/dispOutput_SBND_E500.root");
 
-    int initialSpatialN[3] = {4, 5, 3};
-    int intermediateSpatialN[3] = {6, 5, 4};
-    int initialEFieldN[3] = {4, 5, 3};
-    int intermediateEFieldN[3] = {6, 5, 4};
+    int initialSpatialN[3] = {3, 4, 3};
+    int intermediateSpatialN[3] = {4, 4, 4};
+
+    int initialEFieldN[3] = {3, 3, 3};
+    int intermediateEFieldN[3] = {6, 4, 4};
 
     SpaceChargeSBND *mapSBND = new SpaceChargeSBND("../../OutputFiles/SCEoffsets_SBND_E500.root",
 						   initialSpatialN, intermediateSpatialN, initialEFieldN, intermediateEFieldN,
 						   500.0);
-    int xMin = -210;
-    int xMax = 210;
+    int xMin = -206;
+    int xMax = 206;
     int yMin = -210;
     int yMax = 210;
     int zMin = -10;
     int zMax = 510;
 
-    const int dBins = 240;
+    const int dBins = 150;
     const double minD = -6.0;
     const double maxD = 6.0;
-    const int eBins = 160;
+    const int eBins = 100;
     const double minE = -0.04;
     const double maxE = 0.04;
 
-    TH1D *iDx = new TH1D("iDx", "", dBins, -0.009, 0.003);
+    TH1D *iDx = new TH1D("iDx", "", dBins, -0.01, 0.006);
     TH1D *iDy = new TH1D("iDy", "", dBins, minD / 100.0, maxD / 100.0);
     TH1D *iDz = new TH1D("iDz", "", dBins, minD / 100.0, maxD / 100.0);
     TH1D *iEx = new TH1D("iEx", "", eBins, -3000.0, 3000.0);
     TH1D *iEy = new TH1D("iEy", "", eBins, minE * 100 * 500, maxE * 100 * 500);
     TH1D *iEz = new TH1D("iEz", "", eBins, minE * 100 * 500, maxE * 100 * 500);
 
-    TH1D *mDx = new TH1D("mDx", "", dBins, -0.9, 0.3);
+    TH1D *mDx = new TH1D("mDx", "", dBins, -1.0, 0.6);
     TH1D *mDy = new TH1D("mDy", "", dBins, minD, maxD);
     TH1D *mDz = new TH1D("mDz", "", dBins, minD, maxD);
     TH1D *mEx = new TH1D("mEx", "", eBins, -0.06, 0.06);
@@ -92,14 +95,14 @@ int main()
     TreeE->Draw("Ey>>iEy");
     TreeE->Draw("Ez>>iEz");
 
-    int nSkip = 10;
-    for(int iX = xMin; iX <= xMax; iX++)
+    int nSkip = 5;
+    for(int iX = xMin; iX <= xMax - nSkip; iX++)
         {
             iX = iX + nSkip;
-            for(int iY = yMin; iY <= yMax; iY++)
+            for(int iY = yMin; iY <= yMax - nSkip; iY++)
                 {
                     iY = iY + nSkip;
-                    for(int iZ = zMin; iZ <= zMax; iZ++)
+                    for(int iZ = zMin; iZ <= zMax - nSkip; iZ++)
                         {
                             iZ = iZ + nSkip;
                             cout << iX << ", " << iY << ", " << iZ << endl;
@@ -128,7 +131,7 @@ int main()
         }
 
 
-    TCanvas *cComparisionD = new TCanvas("cComparision", "", 1500, 1800);
+    TCanvas *cComparisionD = new TCanvas("cComparisionD", "", 1300, 1500);
     cComparisionD->Divide(2, 3);
 
     setHisto(iDx, "dDx (m)", "Count");
@@ -140,27 +143,44 @@ int main()
     setHisto(iDz, "dDz (m)", "Count");
     setHisto(mDz, "dDz (cm)", "");
 
-
     cComparisionD->cd(1);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     iDx->Draw();
     cComparisionD->cd(2);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     mDx->Draw();
     cComparisionD->cd(3);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     iDy->Draw();
     cComparisionD->cd(4);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     mDy->Draw();
     cComparisionD->cd(5);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     iDz->Draw();
     cComparisionD->cd(6);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     mDz->Draw();
 
-    TCanvas *cComparisionE = new TCanvas("cComparisionE", "", 1500, 1800);
+    TCanvas *cComparisionE = new TCanvas("cComparisionE", "", 1300, 1500);
     cComparisionE->Divide(2, 3);
 
     setHisto(iEx, "dEx (V/m)", "Count");
@@ -174,22 +194,40 @@ int main()
 
 
     cComparisionE->cd(1);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     iEx->Draw();
     cComparisionE->cd(2);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     mEx->Draw();
     cComparisionE->cd(3);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     iEy->Draw();
     cComparisionE->cd(4);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     mEy->Draw();
     cComparisionE->cd(5);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     iEz->Draw();
     cComparisionE->cd(6);
-    gPad->SetLogy();
+    if(setLog)
+        {
+            gPad->SetLogy();
+        }
     mEz->Draw();
 
     cComparisionD->SaveAs("SBND_Spatial.pdf");

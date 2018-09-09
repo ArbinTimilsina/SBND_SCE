@@ -150,6 +150,7 @@ void MapSCE::PerformTransformation(string FieldToTransform, string DimensionToTr
 
             if(FieldToTransform == "Spatial")
                 {
+                    iBins = xBins - 1;
                     initialWhatToDraw =  "Dy:y_true";
                     initialConditionToDraw = "fabs(x_true-%f)<%f && fabs(z_true-%f)<%f";
                 }
@@ -227,7 +228,7 @@ void MapSCE::PerformTransformation(string FieldToTransform, string DimensionToTr
                     initialStatistics->Draw("SAME");
 
                     cInitialHistos->Update();
-                    cInitialHistos->SaveAs(Form("%s/h%s_InitialHisto_%s_%i_%i.pdf", HistoDirectory.c_str(), FieldToTransform.c_str(), DimensionToTransform.c_str(), i, j));
+                    cInitialHistos->SaveAs(Form("%s/h%s_InitialHisto_%s_%i_%i.pdf", HistoDirectory.c_str(), FieldToTransform.c_str(), DimensionToTransform.c_str(), j, i));
                     tIntermediateTree->Fill();
                     delete cInitialHistos;
 

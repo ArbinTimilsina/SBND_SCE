@@ -81,7 +81,6 @@ void CopyFile(const char *fname, char* dirName)
 int main()
 {
     cout << endl;
-
     TString inputFile = "../../InputFiles/dispOutput_SBND_E500.root";
     string experimentName = "SBND";
     double binningFactor = 12.0;
@@ -113,23 +112,21 @@ int main()
 
     // X dimension
     dimension = "X";
-    initialPolN = 4;
-    intermediatePolN = 6;
+    initialPolN = 3;
+    intermediatePolN = 4;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
 
     // Y dimension
     dimension = "Y";
-    initialPolN = 5;
-    intermediatePolN = 5;
+    initialPolN = 4;
+    intermediatePolN = 4;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
-
 
     // Z dimension
     dimension = "Z";
     initialPolN = 3;
     intermediatePolN = 4;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
-
 
     /////////////////////////////////////////////////////////////////////
     // EField field
@@ -138,14 +135,14 @@ int main()
 
     // X dimension
     dimension = "X";
-    initialPolN = 4;
+    initialPolN = 3;
     intermediatePolN = 6;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
 
     // Y dimension
     dimension = "Y";
-    initialPolN = 5;
-    intermediatePolN = 5;
+    initialPolN = 3;
+    intermediatePolN = 4;
     myMapSCE->PerformTransformation(field, dimension, initialPolN, intermediatePolN);
 
     // Z dimension
